@@ -9,7 +9,7 @@ from textwrap import dedent
 from traitlets import Bool
 
 from .exchange import Exchange
-from ..utils import get_username, check_mode, find_all_notebooks
+from ..utils import get_notebook_username, check_mode, find_all_notebooks
 
 
 class ExchangeSubmit(Exchange):
@@ -43,7 +43,7 @@ class ExchangeSubmit(Exchange):
             self.fail("You don't have write permissions to the directory: {}".format(self.inbound_path))
 
         self.cache_path = os.path.join(self.cache, self.course_id)
-        self.assignment_filename = '{}+{}+{}'.format(get_username(), self.coursedir.assignment_id, self.timestamp)
+        self.assignment_filename = '{}+{}+{}'.format(get_notebook_username(), self.coursedir.assignment_id, self.timestamp)
 
     def init_release(self):
         if self.course_id == '':

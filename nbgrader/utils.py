@@ -164,6 +164,14 @@ def get_username():
     return pwd.getpwuid(os.getuid())[0]
 
 
+def get_notebook_username():
+    """Get the value of the JUPYTERHUB_USER environment variable
+       if it is set. Otherwise return our process's username."""
+    username = os.environ.get('JUPYTERHUB_USER', '')
+    if username != '': return username
+    return get_username()
+
+
 def find_owner(path):
     """Get the username of the owner of path."""
     if pwd is None:
