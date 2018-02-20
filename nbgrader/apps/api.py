@@ -612,12 +612,13 @@ class NbGraderAPI(LoggingConfigurable):
         # ExchangeSubmit.strict == True, then all the notebooks we expect
         # should be here already so we don't need to filter for only
         # existing notebooks in that case.
-        skip_filter = False
         if self.exchange_is_functional:
             app = ExchangeSubmit(coursedir=self.coursedir, parent=self)
             if app.strict:
-                skip_filter = True
+                self.log.info("strict mode on; skipping filter")
+                return sorted(notebooks, key=lambda x: x.id)
 
+        self.log.info("strict mode off; filtering notebooks")
         submissions = list()
         for nb in notebooks:
             filename = os.path.join(
@@ -627,7 +628,7 @@ class NbGraderAPI(LoggingConfigurable):
                     assignment_id=assignment_id)),
                 "{}.ipynb".format(nb.name))
 
-            if skip_filter or os.path.exists(filename):
+            if os.path.exists(filename):
                 submissions.append(nb)
 
         return sorted(submissions, key=lambda x: x.id)
