@@ -10,7 +10,7 @@ from traitlets import Instance, Enum, Unicode, observe
 
 from ..coursedir import CourseDirectory
 from ..converters import Assign, Autograde
-from ..exchange import ExchangeList, ExchangeRelease, ExchangeCollect, ExchangeError
+from ..exchange import ExchangeList, ExchangeRelease, ExchangeCollect, ExchangeError, ExchangeSubmit
 from ..api import MissingEntry, Gradebook, Student, SubmittedAssignment
 from ..utils import parse_utc, temp_attrs, capture_log, as_timezone, to_numeric_tz
 
@@ -604,6 +604,20 @@ class NbGraderAPI(LoggingConfigurable):
             List of :class:`~nbgrader.api.SubmittedNotebook` objects
 
         """
+        # Making a filesystem call for every notebook in the assignment
+        # can be very slow on certain setups, such as using NFS, see
+        # https://github.com/jupyter/nbgrader/issues/929
+        #
+        # If students are using the exchange and submitting with
+        # ExchangeSubmit.strict == True, then all the notebooks we expect
+        # should be here already so we don't need to filter for only
+        # existing notebooks in that case.
+        skip_filter = False
+        if self.exchange_is_functional:
+            app = ExchangeSubmit(coursedir=self.coursedir, parent=self)
+            if app.strict:
+                skip_filter = True
+
         submissions = list()
         for nb in notebooks:
             filename = os.path.join(
@@ -613,7 +627,7 @@ class NbGraderAPI(LoggingConfigurable):
                     assignment_id=assignment_id)),
                 "{}.ipynb".format(nb.name))
 
-            if os.path.exists(filename):
+            if skip_filter or os.path.exists(filename):
                 submissions.append(nb)
 
         return sorted(submissions, key=lambda x: x.id)
