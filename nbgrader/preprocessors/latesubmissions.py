@@ -63,7 +63,7 @@ class AssignLatePenalties(NbGraderPreprocessor):
                     assignment, assignment.total_seconds_late))
 
                 late_penalty = self.plugin_inst.late_submission_penalty(
-                    self.student_id, notebook.score, assignment.total_seconds_late)
+                    self.student_id, notebook.score, notebook.max_score, assignment.total_seconds_late)
                 self.log.warning("Late submission penalty: {}".format(late_penalty))
 
                 if late_penalty is not None:

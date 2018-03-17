@@ -19,7 +19,7 @@ class LateSubmissionPlugin(BasePlugin):
         ),
     ).tag(config=True)
 
-    def late_submission_penalty(self, student_id, score, total_seconds_late):
+    def late_submission_penalty(self, student_id, score, max_score, total_seconds_late):
         """
         Return the late submission penalty based on the predefined method.
 
@@ -29,6 +29,8 @@ class LateSubmissionPlugin(BasePlugin):
             The unique id of the student
         score : float
             The score the student obtained for the submitted notebook
+        max_score : float
+            The maximum possible score of this assignment
         total_seconds_late : float
             The total number of seconds the submitted notebook was late
 
